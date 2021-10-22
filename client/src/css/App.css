@@ -1,0 +1,90 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: #FBF4E9;
+  ;
+}
+
+.footer-padding {
+  padding-bottom: 60px;
+}
+
+.footer {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  background-color: #282c34;
+  padding-top: 15px;
+  z-index: 10;
+}
+
+.footer a {
+padding-left: 15px;
+padding-right: 15px;
+color: #777;
+}
+
+.footer a:hover {
+color: #1abc9c;
+}
+
+.footer p {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #777;
+}
+
+
+.tileContainer {
+  width: 70%;
+  margin: 5% auto 10%;
+}
+
+.btn-secondary {
+  width: 100%;
+  font-size: small;
+}
+
+.input-group-text {
+  width: 20%;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.connectClient {
+  margin-top: 5%;
+  width: 15%;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
