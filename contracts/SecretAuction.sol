@@ -85,7 +85,7 @@ contract SecretAuction {
     RevealStage {
 
       require(CommitHashes[msg.sender].length > 0, "The user has not committed a bid. Reveal not possible");
-      bytes32 revealHash = keccak256(abi.encodePacked(_bidAmount, _auctionKey));
+      bytes32 revealHash = keccak256(abi.encode(_bidAmount, _auctionKey));
 
       require(CommitHashes[msg.sender] == revealHash, "Revealed bid is not the same as the one committed. Reveal not Allowed");
       
