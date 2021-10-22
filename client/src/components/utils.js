@@ -41,3 +41,39 @@ export const getMethodList = function(contract) {
 
     return methodList;
 }
+
+export const defineFunction = async function(inputs, contractInstance, element){
+
+        const inputArray = inputs[0].split(",");
+        if (!contractInstance){
+            return "Please Connect a Client";
+        }
+        let result = {success: null, error: null}; 
+        if (element.callorsend === "call") {
+            if (element.noInputs){
+
+                result.success = await contractInstance.methods[element.textSignature]().call()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
+            } else {
+                result.success = await contractInstance.methods[element.textSignature](...inputArray).call()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
+            }
+            
+        } else if (element.callorsend === "send") {
+            let t;
+            
+            if (element.noInputs) {
+                t = await contractInstance.methods[element.textSignature]().send()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
+            } else {
+                t = await contractInstance.methods[element.textSignature](...inputArray).send()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
+            }
+
+            if (!result.error){ result.success = t.transactionHash}  
+        }
+
+
+        return result.success ?? result.error;
+    
+    }

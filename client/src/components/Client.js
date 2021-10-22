@@ -1,6 +1,6 @@
 // var Contract = require('web3-eth-contract');
 import Web3 from 'web3';
-import { getMethodList } from './utils';
+import { getMethodList, defineFunction } from './utils';
 const contractJSON = require("../contracts/SecretAuction.json"); 
 
 
@@ -27,41 +27,10 @@ export const clientInit = async function(){
 const initiateMethodList = getMethodList(contractJSON);
 
 initiateMethodList.forEach((element) => {
-    element.functionDef = async function(inputs){
-
-        const inputArray = inputs[0].split(",");
-        if (!contractInstance){
-            return "Please Connect a Client";
-        }
-        let result = {success: null, error: null}; 
-        if (element.callorsend === "call") {
-            if (element.noInputs){
-
-                result.success = await contractInstance.methods[element.textSignature]().call()
-                                    .catch(e => {result.error = 'Error: ' + e.message});
-            } else {
-                result.success = await contractInstance.methods[element.textSignature](...inputArray).call()
-                                    .catch(e => {result.error = 'Error: ' + e.message});
-            }
-            
-        } else if (element.callorsend === "send") {
-            let t;
-            
-            if (element.noInputs) {
-                t = await contractInstance.methods[element.textSignature]().send()
-                                    .catch(e => {result.error = 'Error: ' + e.message});
-            } else {
-                t = await contractInstance.methods[element.textSignature](...inputArray).send()
-                                    .catch(e => {result.error = 'Error: ' + e.message});
-            }
-
-            if (!result.error){ result.success = t.transactionHash}  
-        }
-
-
-        return result.success ?? result.error;
-    
+    element.functionDef = function(inputs){
+        return defineFunction(inputs, contractInstance, element);
     }
+    
 })
 
 const _index = initiateMethodList.findIndex((obj => obj.name === "CommitNewBid"));
