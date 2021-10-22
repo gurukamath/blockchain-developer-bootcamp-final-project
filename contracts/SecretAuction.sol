@@ -33,8 +33,13 @@ contract SecretAuction {
     _;
   }
 
-  modifier CommitStage() {
+    modifier CommitStage() {
     require(auctionStage == AuctionStage.Commit);
+    _;
+  }
+
+  modifier StartStage() {
+    require(auctionStage == AuctionStage.Start);
     _;
   }
 
@@ -51,17 +56,17 @@ contract SecretAuction {
     emit LogStageChange("The auction has been deployed to the chain");
   }
 
-  function StartCommitStage() external isOwner(msg.sender) {
+  function StartCommitStage() external isOwner(msg.sender) StartStage {
     auctionStage = AuctionStage.Commit;
     emit LogStageChange("Bids can be committed now");
   }
 
-  function StartRevealStage() external isOwner(msg.sender) {
+  function StartRevealStage() external isOwner(msg.sender) CommitStage {
     auctionStage = AuctionStage.Reveal;
     emit LogStageChange("Bids can be revealed now");
   }
 
-  function CloseAuction() external isOwner(msg.sender) {
+  function CloseAuction() external isOwner(msg.sender) RevealStage {
     auctionStage = AuctionStage.Closed;
     emit LogStageChange("Auction Closed");
   }
