@@ -33,32 +33,33 @@ initiateMethodList.forEach((element) => {
         if (!contractInstance){
             return "Please Connect a Client";
         }
-        let result; 
+        let result = {success: null, error: null}; 
         if (element.callorsend === "call") {
             if (element.noInputs){
 
-                result = await contractInstance.methods[element.textSignature]().call()
-                                    .catch(e => console.log('Error 1: ', e.message));
+                result.success = await contractInstance.methods[element.textSignature]().call()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
             } else {
-                result = await contractInstance.methods[element.textSignature](...inputArray).call()
-                                    .catch(e => console.log('Error 2: ', e.message));
+                result.success = await contractInstance.methods[element.textSignature](...inputArray).call()
+                                    .catch(e => {result.error = 'Error: ' + e.message});
             }
             
         } else if (element.callorsend === "send") {
             let t;
+            
             if (element.noInputs) {
                 t = await contractInstance.methods[element.textSignature]().send()
-                                    .catch(e => console.log('Error 3: ', e.message));
+                                    .catch(e => {result.error = 'Error: ' + e.message});
             } else {
                 t = await contractInstance.methods[element.textSignature](...inputArray).send()
-                                    .catch(e => console.log('Error 4: ', e.message));
+                                    .catch(e => {result.error = 'Error: ' + e.message});
             }
-            result = t.transactionHash;
-            
+
+            if (!result.error){ result.success = t.transactionHash}  
         }
 
 
-        return result;
+        return result.success ?? result.error;
     
     }
 })
@@ -66,6 +67,7 @@ initiateMethodList.forEach((element) => {
 const _index = initiateMethodList.findIndex((obj => obj.name === "CommitNewBid"));
 initiateMethodList[_index].functionDef = async function(inputs) {
     const inputArray = inputs[0].split(",");
+    let result = {success: null, error: null}; 
     if (!contractInstance){
         return "Please Connect a Client";
     }
@@ -74,9 +76,11 @@ initiateMethodList[_index].functionDef = async function(inputs) {
     const hash = web3.utils.sha3(encoded, {encoding: 'hex'})
 
     const t = await contractInstance.methods[initiateMethodList[_index].textSignature](hash).send()
-                                    .catch(e => console.log('Error 4: ', e.message));
+                                    .catch(e => {result.error = 'Error: ' + e.message});
 
-    return t.transactionHash;
+            if (!result.error){ result.success = t.transactionHash} 
+
+    return result.success ?? result.error;
 
 }
 initiateMethodList[_index].inputNames = "uint256 _bidAmount; string _auctionKey";

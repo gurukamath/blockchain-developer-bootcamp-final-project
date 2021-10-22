@@ -34,17 +34,17 @@ contract SecretAuction {
   }
 
     modifier CommitStage() {
-    require(auctionStage == AuctionStage.Commit);
+    require(auctionStage == AuctionStage.Commit, "The auction is not in commit stage");
     _;
   }
 
   modifier StartStage() {
-    require(auctionStage == AuctionStage.Start);
+    require(auctionStage == AuctionStage.Start, "The auction is not in start stage");
     _;
   }
 
   modifier RevealStage() {
-    require(auctionStage == AuctionStage.Reveal);
+    require(auctionStage == AuctionStage.Reveal, "The auction is not in reveal stage");
     _;
   }
 
