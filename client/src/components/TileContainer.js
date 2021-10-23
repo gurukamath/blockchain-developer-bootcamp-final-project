@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import Tile from './Tile.js';
 import {contractMethodList} from './Client.js';
+import {handleErrorMessage} from './utils.js';
 
 
 function TileContainer(props){
@@ -13,8 +14,12 @@ function TileContainer(props){
     }
 
     const clickFunctions = async function(i) {
+        let t;
+        let err;
+        t = await contractMethodList[i].functionDef([inputs[i]])
+                .catch(e => {err = handleErrorMessage(e.message)});
+        if (!t) {t = err};
 
-        const t = await contractMethodList[i].functionDef([inputs[i]]);
         setInputs(Object.assign([...inputs], {[i]: ""}));
         setOutputs(Object.assign(Array(contractMethodList.length).fill(''), {[i]: t}));
     }
