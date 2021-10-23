@@ -1,6 +1,6 @@
 // var Contract = require('web3-eth-contract');
 import Web3 from 'web3';
-import { getMethodList, defineFunction } from './utils';
+import { getMethodList, defineFunction, handleErrorMessage } from './utils';
 const contractJSON = require("../contracts/SecretAuction.json"); 
 
 
@@ -45,8 +45,8 @@ initiateMethodList[_index].functionDef = async function(inputs) {
     const hash = web3.utils.sha3(encoded, {encoding: 'hex'})
 
     const t = await contractInstance.methods[initiateMethodList[_index].textSignature](hash).send()
-                                    .catch(e => {result.error = 'Error: ' + e.message});
-
+                                    .catch(e => {result.error = handleErrorMessage(e.message)});
+            console.log(result.error);
             if (!result.error){ result.success = t.transactionHash} 
 
     return result.success ?? result.error;
