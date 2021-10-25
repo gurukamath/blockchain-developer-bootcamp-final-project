@@ -61,7 +61,7 @@ initiateMethodList.forEach((element) => {
 
 const _index = initiateMethodList.findIndex((obj => obj.name === "CommitNewBid"));
 initiateMethodList[_index].functionDef = async function(inputs) {
-    const inputArray = inputs[0].split(",");
+    const inputArray = inputs;
     let result = {success: null, error: null}; 
     if (!contractInstance){
         return "Please Connect a Client";
@@ -78,7 +78,8 @@ initiateMethodList[_index].functionDef = async function(inputs) {
     return result.success ?? result.error;
 
 }
-initiateMethodList[_index].inputNames = "uint256 _bidAmount; string _auctionKey";
+initiateMethodList[_index].inputNames = [{type: 'uint256', name: '_bidAmount'},
+                                        {type: 'string', name: '_auctionKey'}];
 
 
 export const contractMethodList = initiateMethodList;

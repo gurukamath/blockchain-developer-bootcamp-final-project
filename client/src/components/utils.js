@@ -14,15 +14,14 @@ export const getMethodList = function(contract) {
         methodDefinition.name = element.name;
         methodDefinition.noInputs = false;
         let methodInputs = "";
-        let inputNames = "";
+        let inputNames = [];
         element.inputs.forEach((el) => {
             if (methodInputs === "") {
                 methodInputs = el.type;
-                inputNames = el.type + " " + el.name;
             } else {
                 methodInputs = methodInputs + "," + el.type;
-                inputNames = inputNames + "; " + el.type + " " + el.name;
             }
+            inputNames.push({type: el.type, name: el.name});
         })
         if (methodInputs === ""){
             methodDefinition.noInputs = true;
@@ -68,7 +67,8 @@ export const handleErrorMessage = function(msg) {
 
 export const defineFunction = async function(inputs, contractInstance, element){
 
-        const inputArray = inputs[0].split(",");
+        // const inputArray = inputs[0].split(",");
+        const inputArray = inputs;
         if (!contractInstance){
             return "Please Connect a Client";
         }
@@ -101,3 +101,35 @@ export const defineFunction = async function(inputs, contractInstance, element){
         return result.success ?? result.error;
     
     }
+
+export const getInputFields = function(methodList) {
+    let inputFields = [];
+
+    methodList.forEach(element => {
+        inputFields.push(element.inputNames);
+    })
+    // console.log(inputFields);
+
+    return inputFields;
+}
+
+export const nullifyArray = function(arr) {
+    let nullifiedArray = [];
+
+    arr.forEach(element => {
+        // console.log(element);
+        let elementsUpdated = [];
+        element.forEach(el => {
+            el.value = '';
+            elementsUpdated.push(el);
+        })
+        // const nullElement = Array(element.length).fill('');
+        if (element.length > 0) {
+            nullifiedArray.push(elementsUpdated);
+        } else {
+            nullifiedArray.push([]);
+        }
+        
+    })
+    return nullifiedArray;    
+}

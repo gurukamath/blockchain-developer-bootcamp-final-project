@@ -58,7 +58,7 @@ color: #1abc9c;
 
 .output-display {
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   padding-left: 5%;
   min-height: 5rem;
   /* background-color: #e9ecef; */
@@ -78,6 +78,18 @@ color: #1abc9c;
 .btn-secondary {
   width: 100%;
   font-size: small;
+}
+
+#basic-addon2 {
+  width: 100%
+}
+
+#basic-addon3 {
+  width: 40%
+}
+
+#button-addon {
+  margin-bottom: 2rem;
 }
 
 .input-group-text {
