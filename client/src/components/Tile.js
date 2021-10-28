@@ -17,8 +17,22 @@ function Tile(props){
     const clickFunctions = async function() {
         let t;
         let err;
-        t = await _method.functionDef(inputs)
-                .catch(e => {err = handleErrorMessage(e.message)});
+
+
+        if (_method.name === "CommitNewBid") {
+            const encoded = props.web3.eth.abi.encodeParameters(['uint256', 'string'], inputs);
+            console.log(encoded);
+            const hash = [props.web3.utils.sha3(encoded, {encoding: 'hex'})];
+
+            t = await _method.functionDef(hash, props.contract)
+                    .catch(e => {err = handleErrorMessage(e.message)});
+        } else {
+            t = await _method.functionDef(inputs, props.contract)
+                        .catch(e => {err = handleErrorMessage(e.message)});
+        }
+
+
+
         if (!t) {t = err};
 
         setInputs(Array(inputsList.length).fill(''));
@@ -31,7 +45,8 @@ function Tile(props){
                                     <TileInputs 
                                         input={inputsList[i]}
                                         setValue={v} 
-                                        inputChange={e => changeFunctions(i, e.target.value)}/>  
+                                        inputChange={e => changeFunctions(i, e.target.value)}
+                                        />  
                                 </div>
                             )})
 

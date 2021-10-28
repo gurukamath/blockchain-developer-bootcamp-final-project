@@ -1,36 +1,31 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import TileContainer from './TileContainer.js';
 import Footer from './Footer.js';
 import '../css/App.css';
-import {customizeMethodList} from './MethodListCustom.js';
-import {clientInit} from './Client.js';
-
-
+import {clientInit, defineNewContractInstance} from './Client.js';
 const contractJSON = require("../contracts/SecretAuction.json");
+
 
 
 function App() {
 
-  const [contractMethodList, setContractMethodList] = useState([]);
+  const [display, setDisplay] = useState(<button onClick={onClick} className="btn btn-secondary connectClient">Connect Client</button>);
 
-  useEffect( () => { 
-      async function fetchData() {
-          try {
-              const [web3, contractInstance] =  await clientInit(contractJSON);
-              const contractMethodList = await customizeMethodList(contractJSON, contractInstance, web3);
-              setContractMethodList(contractMethodList);
-          } catch (err) {
-              console.log(err);
-          }
-      }
-      fetchData();
-  }, []);
+
+  let contract;
+  let web3;
+
+  async function onClick() {
+    web3 = await clientInit();
+    contract = await defineNewContractInstance(web3, contractJSON);
+
+    setDisplay(<div className="tileContainer"><TileContainer web3={web3} contract={contract}/></div>)
+  }
 
   return (
     <div className="App">
       <header className="App-header">Simple Storage Application</header>
-      <button onClick={clientInit} className="btn btn-secondary connectClient">Connect Client</button>
-      <div className="tileContainer"><TileContainer contractMethodList={contractMethodList}/></div>
+      {display}
       <Footer/>
     </div>
   );
