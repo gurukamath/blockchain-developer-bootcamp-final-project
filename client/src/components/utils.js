@@ -19,3 +19,22 @@ export const handleErrorMessage = function(msg) {
     })
     return displayMsg;
 }
+
+export const findRole = async (contract, address) => {
+    let result = {success: null, error: null};
+
+        result.success = await contract
+                            .methods['owner()']()
+                            .call()
+                            .catch(e => {result.error = handleErrorMessage(e.message)});
+
+        let role;
+
+        if (address.toUpperCase() === result.success.toUpperCase()) {
+            role = "AuctionOwner";
+        } else {
+            role = "AuctionParticipant";
+        }
+
+    return role;
+}

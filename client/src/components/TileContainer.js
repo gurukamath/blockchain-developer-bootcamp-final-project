@@ -1,12 +1,17 @@
 import React from 'react';
 import Tile from './Tile.js';
 import {FullMethodList} from './FullMethodList.js';
+import {RoleDefinitions} from './Roles.js';
 
 
 
 function TileContainer(props){
 
-    const contractMethodList = FullMethodList;
+    const contractMethodList = FullMethodList.filter((el) => {
+        const roleList = RoleDefinitions[props.role];
+        return roleList.includes(el.name);
+    });
+
 
     return (
         contractMethodList.map((v, i) => (

@@ -21,7 +21,6 @@ function Tile(props){
 
         if (_method.name === "CommitNewBid") {
             const encoded = props.web3.eth.abi.encodeParameters(['uint256', 'string'], inputs);
-            console.log(encoded);
             const hash = [props.web3.utils.sha3(encoded, {encoding: 'hex'})];
 
             t = await _method.functionDef(hash, props.contract)

@@ -19,7 +19,7 @@ const sendFunction = async (inputs, functionHash, contract) => {
                                             .send()
                                             .catch(e => {result.error = handleErrorMessage(e.message)});
                         
-                        return result.success.transactionHash ?? result.error;
+                        return ('Treansaction Successful: ' + result.success.transactionHash) ?? result.error;
                     }
 
 
