@@ -36,6 +36,10 @@ function Tile(props){
 
         setInputs(Array(inputsList.length).fill(''));
         setOutput(t);
+
+        setTimeout(() => { setOutput(''); props.handleClick() }, 10000);
+
+
     }
 
     const tileInputList = inputs.map((v,i) => {
