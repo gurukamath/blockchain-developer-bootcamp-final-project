@@ -6,6 +6,9 @@ contract SecretAuction {
   ///Variables
   address public owner;
 
+  address[] public currentLeaders;
+  uint public currentLeaderBid;
+
   enum AuctionStage {
     Start,
     Commit,
@@ -92,6 +95,13 @@ contract SecretAuction {
       RevealedBids[msg.sender] = _bidAmount;
 
       emit BidRevealed(msg.sender, _bidAmount, _auctionKey);
+
+      if (_bidAmount > currentLeaderBid){
+        currentLeaderBid = _bidAmount;
+        currentLeaders = [msg.sender];
+      } else if (_bidAmount == currentLeaderBid) {
+        currentLeaders.push(msg.sender);
+      }
 
     }
 }

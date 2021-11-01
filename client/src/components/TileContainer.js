@@ -1,7 +1,7 @@
 import React from 'react';
 import Tile from './Tile.js';
 import {FullMethodList} from './FullMethodList.js';
-import {RoleDefinitions} from './Roles.js';
+import {RoleDefinitions, stageDescriptions} from './Roles.js';
 
 
 
@@ -16,16 +16,28 @@ function TileContainer(props){
         return roleList.includes(el.name);
     });
 
+    const tileList = contractMethodList.map((v, i) => (
+                <div key={i}>
+                    <Tile contractMethod={v} web3={props.web3} contract={props.contract} handleClick={props.handleClick}/>
+                </div>
+        )
+    )
+
 
     return (
-        contractMethodList.map((v, i) => (
-            <div key={i}>
-                <Tile contractMethod={v} web3={props.web3} contract={props.contract} handleClick={props.handleClick}/>
+        <div>
+            <div className="card">
+                <div className="card-body">
+                    {stageDescriptions[props.role+props.stage]}
+                </div>
             </div>
-        )
+            
+            {tileList}
+        </div>
+
 
           )
-    )
+    
 }
 
 export default TileContainer;

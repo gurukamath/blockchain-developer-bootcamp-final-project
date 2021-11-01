@@ -34,7 +34,7 @@ export const FullMethodList = [
         const result = await callFunction(inputs, "CommitHashes(address)", contract);
 
         return result;
-      } 
+      },
     },
     {
       name: "RevealedBids",
@@ -82,7 +82,8 @@ export const FullMethodList = [
         const result = await sendFunction(inputs, "StartCommitStage()", contract);
 
         return result;
-      } 
+      },
+      description: 'This function will start the commit stage. Participants can then commit their bids.' 
     },
     {
       name: "StartRevealStage",
@@ -94,7 +95,8 @@ export const FullMethodList = [
         const result = await sendFunction(inputs, "StartRevealStage()", contract);
 
         return result;
-      } 
+      },
+      description: 'You can use this function to start the reveal stage. Participants will no longer be able to commit new bids.'  
     },
     {
       name: "CloseAuction",
@@ -106,7 +108,8 @@ export const FullMethodList = [
         const result = await sendFunction(inputs, "StartRevealStage()", contract);
 
         return result;
-      } 
+      },
+      description: 'You can use this function to close the auction. Participants will no longer be ab;le to reveal any unrevealed bids.' 
     },
     {
       name: "CommitNewBid",
@@ -121,7 +124,8 @@ export const FullMethodList = [
         const result = await sendFunction(inputs, "CommitNewBid(bytes32)", contract);
 
         return result;
-      } 
+      },
+      description: 'Please provide a bid amount and a passphrase (case-sensitive) of your choice. Do remeember both of these values since you will need them to reveal your bids in the reveal stage'  
     },
     {
       name: "RevealCommittedBid",
@@ -136,7 +140,8 @@ export const FullMethodList = [
         const result = await sendFunction(inputs, "RevealCommittedBid(uint256,string)", contract);
 
         return result;
-      } 
+      },
+      description: 'Please provide the exact same bid amount and a passphrase (case-sensitive) that you entered when you comitted the bid' 
     },
   ];
   

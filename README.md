@@ -11,3 +11,12 @@ In many business transactions, including the sale of company assets or an entire
 The Application
 ===============
 The intereseted parties will be able to submit secret bids to a smart contract. The owner of the contract will only be able to declare/control the opening and closing of the auction (both of which will emit events that any interested party can listen into/track). Upon auction close, the smart contract will decide the winning bid without further intervention from the owner.
+
+
+Further Development
+===================
+The following features will be added
+1. Upon auction close, reveal the winner
+2. Write tests to the smart contracts
+3. Provision for a security deposit in bids
+4. Enable participant to withdraw security bid upon auction close

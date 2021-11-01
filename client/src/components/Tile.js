@@ -37,7 +37,7 @@ function Tile(props){
         setInputs(Array(inputsList.length).fill(''));
         setOutput(t);
 
-        setTimeout(() => { setOutput(''); props.handleClick() }, 10000);
+        setTimeout(() => { setOutput(''); props.handleClick() }, 6000);
 
 
     }
@@ -57,10 +57,11 @@ function Tile(props){
     return (
             <div>
                 <div className="mb-3 tile">
-                    <span className="input-group-text" id="basic-addon2">{"Function Name: " + _method.name}</span>
+                    <span className="input-group-text" id="basic-addon2">{_method.name}</span>
+                    <p>{_method.description}</p>
                     {tileInputList}     
                 </div>
-                <input type="text" className="output-display" readOnly value={output}/>
+                {output && <input type="text" className="output-display" readOnly value={output}/>}
                 <span className="input-group-text" id="button-addon">
                     <button type="button" className="btn btn-secondary" onClick={e => clickFunctions()} >Call Function</button>
                 </span>

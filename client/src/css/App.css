@@ -25,6 +25,11 @@
   ;
 }
 
+.card {
+  margin: 30px auto;
+  width: 50%;
+}
+
 .footer-padding {
   padding-bottom: 60px;
 }
@@ -90,6 +95,11 @@ color: #1abc9c;
 
 #button-addon {
   margin-bottom: 2rem;
+}
+
+.tile p {
+  font-size: small;
+  margin: 10px auto;
 }
 
 .input-group-text {
