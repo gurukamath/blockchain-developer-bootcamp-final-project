@@ -23,11 +23,11 @@ contract("SecretAuction", async (accounts) => {
   );
   const hashBob = web3.utils.sha3(encodedBob, { encoding: "hex" });
 
-  beforeEach(async () => {
-    instance = await SecretAuction.new();
-  });
-
   describe("When the auction is deployed", () => {
+    beforeEach(async () => {
+      instance = await SecretAuction.new();
+    });
+
     it("It is in start-auction Stage", async () => {
       const auctionStage = await instance.auctionStage();
       assert.equal(
@@ -57,6 +57,33 @@ contract("SecretAuction", async (accounts) => {
 
     it("Bids cannot yet be committed", async () => {
       catchRevert(instance.CommitNewBid(hashBob, { from: bob }));
+    });
+  });
+
+  describe("When the auction is in commit stage", async () => {
+    beforeEach(async () => {
+      instance = await SecretAuction.new();
+      await instance.StartCommitStage({ from: owner });
+    });
+
+    it("Owner can change to the reveal stage", async () => {
+      await instance.StartRevealStage({ from: owner });
+      const auctionStage = await instance.auctionStage();
+      assert.equal(auctionStage, 2, "The auction is not in reveal stage");
+    });
+
+    it("Non-owner cannot start the reveal stage", async () => {
+      catchRevert(instance.StartRevealStage({ from: alice }));
+    });
+
+    it("Participants can commit their bids", async () => {
+      await instance.CommitNewBid(hashBob, { from: bob });
+      const bobCommittedBid = await instance.CommitHashes(bob);
+      assert.equal(
+        bobCommittedBid,
+        hashBob,
+        "The committed bid hash does not match the one that was sent"
+      );
     });
   });
 });
