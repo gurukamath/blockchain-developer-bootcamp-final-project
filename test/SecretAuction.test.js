@@ -86,4 +86,53 @@ contract("SecretAuction", async (accounts) => {
       );
     });
   });
+
+  describe("When the auction is in reveal stage", async () => {
+    beforeEach(async () => {
+      instance = await SecretAuction.new();
+      await instance.StartCommitStage({ from: owner });
+      await instance.CommitNewBid(hashAlice, { from: alice });
+      await instance.StartRevealStage({ from: owner });
+    });
+
+    it("Owner can close the auction", async () => {
+      await instance.CloseAuction({ from: owner });
+      const auctionStage = await instance.auctionStage();
+      assert.equal(auctionStage, 3, "The auction has not been closed");
+    });
+
+    it("Non-owner cannot close the auction", async () => {
+      catchRevert(instance.CloseAuction({ from: alice }));
+    });
+
+    it("Participants cannot commit new bids", async () => {
+      catchRevert(instance.CommitNewBid(hashBob, { from: bob }));
+    });
+
+    it("Participants can reveal their previously committed bid", async () => {
+      await instance.RevealCommittedBid(amountAlice, phraseAlice, {
+        from: alice,
+      });
+      const bidAmount = await instance.RevealedBids(alice);
+
+      assert.equal(
+        bidAmount,
+        amountAlice,
+        "The revealed bid is not the same as the committed bid"
+      );
+    });
+
+    it("Participants cannot reveal their bid with the wrong amount", async () => {
+      catchRevert(instance.RevealCommittedBid(501, phraseAlice), {
+        from: alice,
+      });
+    });
+
+    it("Participants cannot reveal their bid with the wrong passphrase", async () => {
+      //Using alice instead of Alice in the passphrase
+      catchRevert(instance.RevealCommittedBid(amountAlice, "Thisisalice"), {
+        from: alice,
+      });
+    });
+  });
 });
