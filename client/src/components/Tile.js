@@ -6,8 +6,6 @@ function Tile(props) {
   const _method = props.contractMethod;
   const inputsList = _method.inputNames;
 
-  console.log(props.accounts);
-
   const [inputs, setInputs] = useState(Array(inputsList.length).fill(""));
   const [output, setOutput] = useState("");
 

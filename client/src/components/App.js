@@ -15,10 +15,11 @@ const factoryJSON = require("../contracts/AuctionFactory.json");
 let factory;
 let currRole = "";
 let currStage = 0;
-let accounts;
+let currAccounts;
 
 function App() {
   const [web3Provider, setWeb3Provider] = useState("");
+  const [accounts, setAccounts] = useState([]);
   const [deployedAuctionAddresses, setDeployedAuctionAddresses] = useState([]);
   const [contract, setContract] = useState("");
   const [role, setRole] = useState("");
@@ -27,97 +28,90 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       if (web3Provider.currentProvider) {
-        accounts = await web3Provider.currentProvider.request({
+        currAccounts = await web3Provider.currentProvider.request({
           method: "eth_requestAccounts",
         });
-        console.log(accounts);
+        setAccounts(currAccounts);
 
-        if (contract) {
-          currRole = await findRole(contract, accounts[0]).catch((e) =>
-            console.log(e)
-          );
-
-          setRole(currRole);
-
-          currStage = await contract.methods["auctionStage()"]().call();
-
-          setStage(currStage);
-        }
+        web3Provider.currentProvider.on("accountsChanged", async (accounts) => {
+          currAccounts = await web3Provider.currentProvider.request({
+            method: "eth_requestAccounts",
+          });
+          setAccounts(currAccounts);
+        });
       }
     }
     fetchData();
-  }, [web3Provider, contract]);
+  }, [web3Provider]);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (contract) {
+        currRole = await findRole(contract, accounts[0]).catch((e) =>
+          console.log(e)
+        );
+
+        setRole(currRole);
+
+        currStage = await contract.methods["auctionStage()"]().call();
+
+        setStage(currStage);
+      }
+    }
+
+    fetchData();
+  }, [contract, accounts]);
 
   async function providerConnect() {
     const web3 = await clientInit();
     setWeb3Provider(web3);
     factory = await defineNewContractInstance(web3, factoryJSON);
-    accounts = await web3.currentProvider.request({
-      method: "eth_requestAccounts",
-    });
 
     const deployedAuctionList = await factory.getPastEvents("ContractCreated", {
       fromBlock: 0,
       toBlock: "latest",
     });
+    console.log(deployedAuctionList);
     const addressList = deployedAuctionList.map((v) => {
-      return v["returnValues"]["newAddress"];
+      console.log(v["returnValues"]);
+      return v["returnValues"];
+      // return v["returnValues"]["newAddress"];
     });
+    console.log(addressList);
     setDeployedAuctionAddresses(addressList);
-
-    // web3Provider.currentProvider.on("accountsChanged", async (accounts) => {
-    //   // web3 = await clientInit();
-    //   // contract = await defineNewContractInstance(web3Provider, contractJSON);
-    //   accounts = await web3Provider.currentProvider.request({
-    //     method: "eth_requestAccounts",
-    //   });
-
-    //   currRole = await findRole(contract, accounts[0]);
-
-    //   setRole(currRole);
-
-    //   currStage = await contract.methods["auctionStage()"]().call();
-
-    //   setStage(currStage);
-    // });
   }
 
-  async function createNewAuction() {
-    console.log("new contract creation started");
+  async function createNewAuction(name, desc) {
     factory = await defineNewContractInstance(web3Provider, factoryJSON);
-    accounts = await web3Provider.currentProvider.request({
-      method: "eth_requestAccounts",
-    });
-    const newContractReceipt = await factory.methods["createAuction()"]()
-      .send()
-      .catch((e) => {
-        console.log(e);
-      });
+    console.log(factory.methods["createAuction(string,string)"]);
+
+    const receipt = await factory.methods["createAuction(string,string)"](
+      name.toString(),
+      desc.toString()
+    ).send({ from: accounts[0] });
+    // .catch((e) => {
+    //   console.log(e);
+    // });
+    console.log(receipt);
     const newContractAddress =
-      newContractReceipt["events"]["ContractCreated"]["returnValues"][
-        "newAddress"
-      ];
+      receipt["events"]["ContractCreated"]["returnValues"]["newAddress"];
     const newContract = new web3Provider.eth.Contract(
       contractJSON.abi,
       newContractAddress
     );
 
+    console.log(newContract);
+
     setContract(newContract);
   }
 
-  async function handleClick() {
-    // web3 = await clientInit();
-    // const auction = await defineNewContractInstance(web3Provider, contractJSON);
-    // setContract(auction);
-    // accounts = await web3Provider.currentProvider.request({
-    //   method: "eth_requestAccounts",
-    // });
-    // currRole = await findRole(contract, accounts[0]).catch((e) =>
-    //   console.log(e)
-    // );
-    // setRole(currRole);
-    // currStage = await contract.methods["auctionStage()"]().call();
-    // setStage(currStage);
+  async function selectAuction(auctionAddress) {
+    const newContract = new web3Provider.eth.Contract(
+      contractJSON.abi,
+      auctionAddress
+    );
+
+    setContract(newContract);
   }
 
   return (
@@ -136,9 +130,12 @@ function App() {
       {web3Provider && !contract && (
         <div>
           <AuctionCreator createNewAuction={createNewAuction} />
-          <AuctionSelector
-            deployedAuctionAddresses={deployedAuctionAddresses}
-          />
+          {deployedAuctionAddresses.length !== 0 && (
+            <AuctionSelector
+              deployedAuctionAddresses={deployedAuctionAddresses}
+              selectAuction={selectAuction}
+            />
+          )}
         </div>
       )}
       {contract && role === "AuctionOwner" && stage === "0" && (
@@ -147,7 +144,7 @@ function App() {
             web3={web3Provider}
             contract={contract}
             accounts={accounts}
-            handleClick={handleClick}
+            // handleClick={handleClick}
             role={role}
             stage={stage}
           />
@@ -159,7 +156,7 @@ function App() {
             web3={web3Provider}
             contract={contract}
             accounts={accounts}
-            handleClick={handleClick}
+            // handleClick={handleClick}
             role={role}
             stage={stage}
           />
@@ -171,7 +168,7 @@ function App() {
             web3={web3Provider}
             contract={contract}
             accounts={accounts}
-            handleClick={handleClick}
+            // handleClick={handleClick}
             role={role}
             stage={stage}
           />
@@ -184,7 +181,7 @@ function App() {
             web3={web3Provider}
             contract={contract}
             accounts={accounts}
-            handleClick={handleClick}
+            // handleClick={handleClick}
             role={role}
             stage={stage}
           />
@@ -196,7 +193,7 @@ function App() {
             web3={web3Provider}
             contract={contract}
             accounts={accounts}
-            handleClick={handleClick}
+            // handleClick={handleClick}
             role={role}
             stage={stage}
           />

@@ -6,7 +6,6 @@ import { RoleDefinitions, stageDescriptions } from "./Roles.js";
 function TileContainer(props) {
   // const contractMethodList = FullMethodList[props.role+props.stage];
   // console.log(contractMethodList);
-  console.log(props.accounts);
 
   const contractMethodList = FullMethodList.filter((el) => {
     const roleList = RoleDefinitions[props.role + props.stage];

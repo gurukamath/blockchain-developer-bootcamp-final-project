@@ -137,7 +137,7 @@ export const FullMethodList = [
     functionDef: async (inputs, contract, accounts) => {
       const result = await sendFunction(
         inputs,
-        "StartRevealStage()",
+        "CloseAuction()",
         contract,
         accounts
       );
