@@ -52,9 +52,9 @@ contract SecretAuction {
   }
 
 
-  constructor() {
+  constructor(address _owner) {
 
-    owner = msg.sender;
+    owner = _owner;
 
     emit LogStageChange("The auction has been deployed to the chain");
   }

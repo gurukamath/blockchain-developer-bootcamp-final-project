@@ -1,5 +1,5 @@
-var SecretAuction = artifacts.require("./SecretAuction.sol");
+var AuctionFactory = artifacts.require("./AuctionFactory.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(SecretAuction);
+  deployer.deploy(AuctionFactory);
 };
