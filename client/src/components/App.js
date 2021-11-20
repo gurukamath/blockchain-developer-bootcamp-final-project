@@ -3,6 +3,7 @@ import TileContainer from "./TileContainer.js";
 import AuctionSelector from "./AuctionSelector.js";
 import AuctionCreator from "./AuctionCreator.js";
 import Footer from "./Footer.js";
+import Header from "./Header.js";
 import "../css/App.css";
 import { clientInit, defineNewContractInstance } from "./Client.js";
 import { findRole } from "./utils.js";
@@ -21,7 +22,12 @@ function App() {
   const [web3Provider, setWeb3Provider] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [deployedAuctionAddresses, setDeployedAuctionAddresses] = useState([]);
-  const [contract, setContract] = useState("");
+  const [contract, setContract] = useState({
+    name: "",
+    desc: "",
+    address: "",
+    contractDetails: "",
+  });
   const [role, setRole] = useState("");
   const [stage, setStage] = useState(0);
 
@@ -46,14 +52,16 @@ function App() {
 
   useEffect(() => {
     async function fetchData() {
-      if (contract) {
-        currRole = await findRole(contract, accounts[0]).catch((e) =>
-          console.log(e)
+      if (contract.contractDetails) {
+        currRole = await findRole(contract.contractDetails, accounts[0]).catch(
+          (e) => console.log(e)
         );
 
         setRole(currRole);
 
-        currStage = await contract.methods["auctionStage()"]().call();
+        currStage = await contract.contractDetails.methods[
+          "auctionStage()"
+        ]().call();
 
         setStage(currStage);
       }
@@ -71,53 +79,59 @@ function App() {
       fromBlock: 0,
       toBlock: "latest",
     });
-    console.log(deployedAuctionList);
+
     const addressList = deployedAuctionList.map((v) => {
-      console.log(v["returnValues"]);
       return v["returnValues"];
-      // return v["returnValues"]["newAddress"];
     });
-    console.log(addressList);
+
     setDeployedAuctionAddresses(addressList);
   }
 
   async function createNewAuction(name, desc) {
     factory = await defineNewContractInstance(web3Provider, factoryJSON);
-    console.log(factory.methods["createAuction(string,string)"]);
 
     const receipt = await factory.methods["createAuction(string,string)"](
       name.toString(),
       desc.toString()
-    ).send({ from: accounts[0] });
-    // .catch((e) => {
-    //   console.log(e);
-    // });
-    console.log(receipt);
-    const newContractAddress =
-      receipt["events"]["ContractCreated"]["returnValues"]["newAddress"];
+    )
+      .send({ from: accounts[0] })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    const newContractDetails =
+      receipt["events"]["ContractCreated"]["returnValues"];
     const newContract = new web3Provider.eth.Contract(
       contractJSON.abi,
-      newContractAddress
+      newContractDetails["newAddress"]
     );
 
-    console.log(newContract);
-
-    setContract(newContract);
+    setContract({
+      name: newContractDetails._name.toString(),
+      desc: newContractDetails._desc.toString(),
+      address: newContractDetails.newAddress,
+      contractDetails: newContract,
+    });
   }
 
-  async function selectAuction(auctionAddress) {
+  async function selectAuction(auction) {
     const newContract = new web3Provider.eth.Contract(
       contractJSON.abi,
-      auctionAddress
+      auction.newAddress
     );
 
-    setContract(newContract);
+    setContract({
+      name: auction._name,
+      desc: auction._desc,
+      address: auction.newAddress,
+      contractDetails: newContract,
+    });
   }
 
   return (
     <div className="App">
-      <header className="App-header">Secret Auction Application</header>
-      {!web3Provider && !contract && (
+      <Header account={accounts[0]} />
+      {!web3Provider && !contract.contractDetails && (
         <button
           onClick={() => {
             providerConnect();
@@ -127,7 +141,7 @@ function App() {
           Connect Client
         </button>
       )}
-      {web3Provider && !contract && (
+      {web3Provider && !contract.contractDetails && (
         <div>
           <AuctionCreator createNewAuction={createNewAuction} />
           {deployedAuctionAddresses.length !== 0 && (
@@ -138,11 +152,11 @@ function App() {
           )}
         </div>
       )}
-      {contract && role === "AuctionOwner" && stage === "0" && (
+      {contract.contractDetails && role === "AuctionOwner" && stage === "0" && (
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract}
+            contract={contract.contractDetails}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -150,11 +164,11 @@ function App() {
           />
         </div>
       )}
-      {contract && role === "AuctionOwner" && stage === "1" && (
+      {contract.contractDetails && role === "AuctionOwner" && stage === "1" && (
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract}
+            contract={contract.contractDetails}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -162,11 +176,11 @@ function App() {
           />
         </div>
       )}
-      {contract && role === "AuctionOwner" && stage === "2" && (
+      {contract.contractDetails && role === "AuctionOwner" && stage === "2" && (
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract}
+            contract={contract.contractDetails}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -175,30 +189,34 @@ function App() {
         </div>
       )}
 
-      {contract && role === "AuctionParticipant" && stage === "1" && (
-        <div className="tileContainer">
-          <TileContainer
-            web3={web3Provider}
-            contract={contract}
-            accounts={accounts}
-            // handleClick={handleClick}
-            role={role}
-            stage={stage}
-          />
-        </div>
-      )}
-      {contract && role === "AuctionParticipant" && stage === "2" && (
-        <div className="tileContainer">
-          <TileContainer
-            web3={web3Provider}
-            contract={contract}
-            accounts={accounts}
-            // handleClick={handleClick}
-            role={role}
-            stage={stage}
-          />
-        </div>
-      )}
+      {contract.contractDetails &&
+        role === "AuctionParticipant" &&
+        stage === "1" && (
+          <div className="tileContainer">
+            <TileContainer
+              web3={web3Provider}
+              contract={contract.contractDetails}
+              accounts={accounts}
+              // handleClick={handleClick}
+              role={role}
+              stage={stage}
+            />
+          </div>
+        )}
+      {contract.contractDetails &&
+        role === "AuctionParticipant" &&
+        stage === "2" && (
+          <div className="tileContainer">
+            <TileContainer
+              web3={web3Provider}
+              contract={contract.contractDetails}
+              accounts={accounts}
+              // handleClick={handleClick}
+              role={role}
+              stage={stage}
+            />
+          </div>
+        )}
       <Footer />
     </div>
   );
