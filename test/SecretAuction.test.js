@@ -1,8 +1,9 @@
 const { catchRevert } = require("./exceptionsHelpers.js");
 
+var AuctionFactory = artifacts.require("AuctionFactory");
 var SecretAuction = artifacts.require("SecretAuction");
 
-contract("SecretAuction", async (accounts) => {
+contract("AuctionFactory", async (accounts) => {
   const [owner, alice, bob] = accounts;
 
   //Alice's Bid
@@ -25,7 +26,15 @@ contract("SecretAuction", async (accounts) => {
 
   describe("When the auction is deployed", () => {
     beforeEach(async () => {
-      instance = await SecretAuction.new();
+      const factoryInstance = await AuctionFactory.new();
+      const createTx = await factoryInstance.createAuction(
+        "Test",
+        "This is a test Auction",
+        { from: owner }
+      );
+
+      const newContractAddress = createTx["logs"][0]["args"]["newAddress"];
+      instance = await SecretAuction.at(newContractAddress);
     });
 
     it("It is in start-auction Stage", async () => {
@@ -62,7 +71,15 @@ contract("SecretAuction", async (accounts) => {
 
   describe("When the auction is in commit stage", async () => {
     beforeEach(async () => {
-      instance = await SecretAuction.new();
+      const factoryInstance = await AuctionFactory.new();
+      const createTx = await factoryInstance.createAuction(
+        "Test",
+        "This is a test Auction",
+        { from: owner }
+      );
+
+      const newContractAddress = createTx["logs"][0]["args"]["newAddress"];
+      instance = await SecretAuction.at(newContractAddress);
       await instance.StartCommitStage({ from: owner });
     });
 
@@ -89,7 +106,15 @@ contract("SecretAuction", async (accounts) => {
 
   describe("When the auction is in reveal stage", async () => {
     beforeEach(async () => {
-      instance = await SecretAuction.new();
+      const factoryInstance = await AuctionFactory.new();
+      const createTx = await factoryInstance.createAuction(
+        "Test",
+        "This is a test Auction",
+        { from: owner }
+      );
+
+      const newContractAddress = createTx["logs"][0]["args"]["newAddress"];
+      instance = await SecretAuction.at(newContractAddress);
       await instance.StartCommitStage({ from: owner });
       await instance.CommitNewBid(hashAlice, { from: alice });
       await instance.StartRevealStage({ from: owner });
