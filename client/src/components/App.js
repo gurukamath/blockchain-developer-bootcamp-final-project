@@ -11,16 +11,17 @@ import { findRole } from "./utils.js";
 const contractJSON = require("../contracts/SecretAuction.json");
 const factoryJSON = require("../contracts/AuctionFactory.json");
 
-// let contract;
-// let web3;
 let factory;
 let currRole = "";
 let currStage = 0;
 let currAccounts;
+let currNetwork;
+const expectedNetwork = 1337;
 
 function App() {
   const [web3Provider, setWeb3Provider] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const [network, setNetwork] = useState("");
   const [deployedAuctionAddresses, setDeployedAuctionAddresses] = useState([]);
   const [contract, setContract] = useState({
     name: "",
@@ -41,13 +42,22 @@ function App() {
           .catch((e) => window.alert(e.message));
         setAccounts(currAccounts);
 
+        currNetwork = await web3Provider.eth
+          .getChainId()
+          .catch((e) => window.alert(e.message));
+
+        setNetwork(currNetwork);
+
         web3Provider.currentProvider.on("accountsChanged", async (accounts) => {
-          currAccounts = await web3Provider.currentProvider
-            .request({
-              method: "eth_requestAccounts",
-            })
+          setAccounts(accounts);
+        });
+
+        web3Provider.currentProvider.on("chainChanged", async (network) => {
+          currNetwork = await web3Provider.eth
+            .getChainId()
             .catch((e) => window.alert(e.message));
-          setAccounts(currAccounts);
+
+          setNetwork(currNetwork);
         });
       }
     }
@@ -56,43 +66,54 @@ function App() {
 
   useEffect(() => {
     async function fetchData() {
-      if (contract.contractDetails) {
-        currRole = await findRole(contract.contractDetails, accounts[0]).catch(
-          (e) => window.alert(e)
-        );
+      if (network === expectedNetwork) {
+        if (contract.contractDetails) {
+          currRole = await findRole(
+            contract.contractDetails,
+            accounts[0]
+          ).catch((e) => window.alert(e));
 
-        setRole(currRole);
+          setRole(currRole);
 
-        currStage = await contract.contractDetails.methods["auctionStage()"]()
-          .call()
+          currStage = await contract.contractDetails.methods["auctionStage()"]()
+            .call()
+            .catch((e) => window.alert(e));
+
+          setStage(currStage);
+        }
+
+        factory = await defineNewContractInstance(
+          web3Provider,
+          factoryJSON
+        ).catch((e) => window.alert(e));
+
+        const deployedAuctionList = await factory
+          .getPastEvents("ContractCreated", {
+            fromBlock: 0,
+            toBlock: "latest",
+          })
           .catch((e) => window.alert(e));
 
-        setStage(currStage);
+        const addressList = deployedAuctionList.map((v) => {
+          return v["returnValues"];
+        });
+
+        setDeployedAuctionAddresses(addressList);
       }
     }
 
     fetchData();
-  }, [contract, accounts]);
+  }, [web3Provider, contract, accounts, network]);
 
   async function providerConnect() {
     const web3 = await clientInit().catch((e) => window.alert(e.message));
     setWeb3Provider(web3);
-    factory = await defineNewContractInstance(web3, factoryJSON).catch((e) =>
-      window.alert(e)
-    );
 
-    const deployedAuctionList = await factory
-      .getPastEvents("ContractCreated", {
-        fromBlock: 0,
-        toBlock: "latest",
-      })
-      .catch((e) => window.alert(e));
+    // currNetwork = await web3.eth
+    //   .getChainId()
+    //   .catch((e) => window.alert(e.message));
 
-    const addressList = deployedAuctionList.map((v) => {
-      return v["returnValues"];
-    });
-
-    setDeployedAuctionAddresses(addressList);
+    // setNetwork(currNetwork);
   }
 
   async function createNewAuction(name, desc) {
@@ -147,55 +168,73 @@ function App() {
           Connect Client
         </button>
       )}
-      {web3Provider && !contract.contractDetails && (
+      {web3Provider && network !== expectedNetwork && (
         <div>
-          <AuctionCreator createNewAuction={createNewAuction} />
-          {deployedAuctionAddresses.length !== 0 && (
-            <AuctionSelector
-              deployedAuctionAddresses={deployedAuctionAddresses}
-              selectAuction={selectAuction}
+          You are not connected to the Ropsten Network. Please change the
+          network in your Web3 provider.
+        </div>
+      )}
+      {web3Provider &&
+        network === expectedNetwork &&
+        !contract.contractDetails && (
+          <div>
+            <AuctionCreator createNewAuction={createNewAuction} />
+            {deployedAuctionAddresses.length !== 0 && (
+              <AuctionSelector
+                deployedAuctionAddresses={deployedAuctionAddresses}
+                selectAuction={selectAuction}
+              />
+            )}
+          </div>
+        )}
+      {network === expectedNetwork &&
+        contract.contractDetails &&
+        role === "AuctionOwner" &&
+        stage === "0" && (
+          <div className="tileContainer">
+            <TileContainer
+              web3={web3Provider}
+              contract={contract}
+              accounts={accounts}
+              // handleClick={handleClick}
+              role={role}
+              stage={stage}
             />
-          )}
-        </div>
-      )}
-      {contract.contractDetails && role === "AuctionOwner" && stage === "0" && (
-        <div className="tileContainer">
-          <TileContainer
-            web3={web3Provider}
-            contract={contract}
-            accounts={accounts}
-            // handleClick={handleClick}
-            role={role}
-            stage={stage}
-          />
-        </div>
-      )}
-      {contract.contractDetails && role === "AuctionOwner" && stage === "1" && (
-        <div className="tileContainer">
-          <TileContainer
-            web3={web3Provider}
-            contract={contract}
-            accounts={accounts}
-            // handleClick={handleClick}
-            role={role}
-            stage={stage}
-          />
-        </div>
-      )}
-      {contract.contractDetails && role === "AuctionOwner" && stage === "2" && (
-        <div className="tileContainer">
-          <TileContainer
-            web3={web3Provider}
-            contract={contract}
-            accounts={accounts}
-            // handleClick={handleClick}
-            role={role}
-            stage={stage}
-          />
-        </div>
-      )}
+          </div>
+        )}
+      {network === expectedNetwork &&
+        contract.contractDetails &&
+        role === "AuctionOwner" &&
+        stage === "1" && (
+          <div className="tileContainer">
+            <TileContainer
+              web3={web3Provider}
+              contract={contract}
+              accounts={accounts}
+              // handleClick={handleClick}
+              role={role}
+              stage={stage}
+            />
+          </div>
+        )}
+      {network === expectedNetwork &&
+        contract.contractDetails &&
+        role === "AuctionOwner" &&
+        stage === "2" && (
+          <div className="tileContainer">
+            <TileContainer
+              web3={web3Provider}
+              contract={contract}
+              accounts={accounts}
+              // handleClick={handleClick}
+              role={role}
+              stage={stage}
+            />
+          </div>
+        )}
 
-      {contract.contractDetails &&
+      {network === expectedNetwork &&
+        contract.contractDetails &&
         role === "AuctionParticipant" &&
         stage === "1" && (
           <div className="tileContainer">
@@ -209,7 +248,8 @@ function App() {
             />
           </div>
         )}
-      {contract.contractDetails &&
+      {network === expectedNetwork &&
+        contract.contractDetails &&
         role === "AuctionParticipant" &&
         stage === "2" && (
           <div className="tileContainer">
