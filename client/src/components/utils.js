@@ -16,6 +16,9 @@ export const handleErrorMessage = function (msg) {
       displayMsg = msg.replace(errorString + element, `(${element}) -`);
     }
   });
+  if (displayMsg === "Unknown Error!") {
+    window.alert(msg);
+  }
   return displayMsg;
 };
 

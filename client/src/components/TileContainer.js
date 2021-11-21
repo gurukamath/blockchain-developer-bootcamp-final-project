@@ -17,7 +17,7 @@ function TileContainer(props) {
       <Tile
         contractMethod={v}
         web3={props.web3}
-        contract={props.contract}
+        contract={props.contract.contractDetails}
         accounts={props.accounts}
       />
     </div>
@@ -27,7 +27,30 @@ function TileContainer(props) {
     <div>
       <div className="card">
         <div className="card-body">
-          {stageDescriptions[props.role + props.stage]}
+          <p>
+            <span>
+              <b>Auction Name: </b>
+            </span>
+            {props.contract.name}
+          </p>
+          <p>
+            <span>
+              <b>Auction Description: </b>
+            </span>
+            {props.contract.desc}
+          </p>
+          <p>
+            <span>
+              <b>Your Role: </b>
+            </span>
+            {props.role}
+          </p>
+          <p>
+            <span>
+              <b>Tip: </b>
+            </span>
+            {stageDescriptions[props.role + props.stage]}
+          </p>
         </div>
       </div>
 

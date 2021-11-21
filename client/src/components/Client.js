@@ -5,7 +5,9 @@ export const clientInit = async function () {
   let web3;
 
   // Initiate the Web3 Provider
-  const provider = await detectEthereumProvider();
+  const provider = await detectEthereumProvider().catch((e) =>
+    window.alert(e.message)
+  );
 
   if (provider === window.ethereum) {
     web3 = new Web3(provider);
@@ -20,13 +22,17 @@ export const defineNewContractInstance = async function (
   web3Instance,
   contractJsonObject
 ) {
-  const netId = await web3Instance.currentProvider.request({
-    method: "net_version",
-  });
+  const netId = await web3Instance.currentProvider
+    .request({
+      method: "net_version",
+    })
+    .catch((e) => window.alert(e.message));
 
-  const accounts = await web3Instance.currentProvider.request({
-    method: "eth_requestAccounts",
-  });
+  const accounts = await web3Instance.currentProvider
+    .request({
+      method: "eth_requestAccounts",
+    })
+    .catch((e) => window.alert(e.message));
 
   return new web3Instance.eth.Contract(
     contractJsonObject.abi,

@@ -42,6 +42,18 @@
   padding-top: 17px;
 }
 
+.create-auc-btn {
+  margin-top: 2%;
+  width: 15%;
+}
+
+.create-auction-row {
+  width: 80%;
+  margin: auto;
+  text-align: right;
+}
+
+
 .card {
   margin: 30px auto;
   width: 50%;
@@ -97,10 +109,10 @@ color: #1abc9c;
   margin-bottom: 0!important;
 }
 
-.btn-secondary {
+/* .btn-secondary {
   width: 100%;
   font-size: small;
-}
+} */
 
 #basic-addon2 {
   width: 100%

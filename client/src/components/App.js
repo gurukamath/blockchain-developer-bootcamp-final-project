@@ -34,15 +34,19 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       if (web3Provider.currentProvider) {
-        currAccounts = await web3Provider.currentProvider.request({
-          method: "eth_requestAccounts",
-        });
+        currAccounts = await web3Provider.currentProvider
+          .request({
+            method: "eth_requestAccounts",
+          })
+          .catch((e) => window.alert(e.message));
         setAccounts(currAccounts);
 
         web3Provider.currentProvider.on("accountsChanged", async (accounts) => {
-          currAccounts = await web3Provider.currentProvider.request({
-            method: "eth_requestAccounts",
-          });
+          currAccounts = await web3Provider.currentProvider
+            .request({
+              method: "eth_requestAccounts",
+            })
+            .catch((e) => window.alert(e.message));
           setAccounts(currAccounts);
         });
       }
@@ -54,14 +58,14 @@ function App() {
     async function fetchData() {
       if (contract.contractDetails) {
         currRole = await findRole(contract.contractDetails, accounts[0]).catch(
-          (e) => console.log(e)
+          (e) => window.alert(e)
         );
 
         setRole(currRole);
 
-        currStage = await contract.contractDetails.methods[
-          "auctionStage()"
-        ]().call();
+        currStage = await contract.contractDetails.methods["auctionStage()"]()
+          .call()
+          .catch((e) => window.alert(e));
 
         setStage(currStage);
       }
@@ -71,14 +75,18 @@ function App() {
   }, [contract, accounts]);
 
   async function providerConnect() {
-    const web3 = await clientInit();
+    const web3 = await clientInit().catch((e) => window.alert(e.message));
     setWeb3Provider(web3);
-    factory = await defineNewContractInstance(web3, factoryJSON);
+    factory = await defineNewContractInstance(web3, factoryJSON).catch((e) =>
+      window.alert(e)
+    );
 
-    const deployedAuctionList = await factory.getPastEvents("ContractCreated", {
-      fromBlock: 0,
-      toBlock: "latest",
-    });
+    const deployedAuctionList = await factory
+      .getPastEvents("ContractCreated", {
+        fromBlock: 0,
+        toBlock: "latest",
+      })
+      .catch((e) => window.alert(e));
 
     const addressList = deployedAuctionList.map((v) => {
       return v["returnValues"];
@@ -95,9 +103,7 @@ function App() {
       desc.toString()
     )
       .send({ from: accounts[0] })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e) => window.alert(e.message));
 
     const newContractDetails =
       receipt["events"]["ContractCreated"]["returnValues"];
@@ -156,7 +162,7 @@ function App() {
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract.contractDetails}
+            contract={contract}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -168,7 +174,7 @@ function App() {
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract.contractDetails}
+            contract={contract}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -180,7 +186,7 @@ function App() {
         <div className="tileContainer">
           <TileContainer
             web3={web3Provider}
-            contract={contract.contractDetails}
+            contract={contract}
             accounts={accounts}
             // handleClick={handleClick}
             role={role}
@@ -195,7 +201,7 @@ function App() {
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
-              contract={contract.contractDetails}
+              contract={contract}
               accounts={accounts}
               // handleClick={handleClick}
               role={role}
@@ -209,7 +215,7 @@ function App() {
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
-              contract={contract.contractDetails}
+              contract={contract}
               accounts={accounts}
               // handleClick={handleClick}
               role={role}

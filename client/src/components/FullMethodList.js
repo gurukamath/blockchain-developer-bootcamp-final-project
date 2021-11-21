@@ -22,7 +22,7 @@ const sendFunction = async (inputs, functionHash, contract, accounts) => {
     });
 
   return (
-    "Treansaction Successful: " + result.success.transactionHash ?? result.error
+    "Transaction Successful: " + result.success.transactionHash ?? result.error
   );
 };
 
@@ -145,7 +145,7 @@ export const FullMethodList = [
       return result;
     },
     description:
-      "You can use this function to close the auction. Participants will no longer be ab;le to reveal any unrevealed bids.",
+      "You can use this function to close the auction. Participants will no longer be able to reveal any unrevealed bids.",
   },
   {
     name: "CommitNewBid",
@@ -167,7 +167,7 @@ export const FullMethodList = [
       return result;
     },
     description:
-      "Please provide a bid amount and a passphrase (case-sensitive) of your choice. Do remeember both of these values since you will need them to reveal your bids in the reveal stage",
+      "Please provide a bid amount and a passphrase (case-sensitive) of your choice. Do remember both of these values since you will need them to reveal your bids in the reveal stage",
   },
   {
     name: "RevealCommittedBid",

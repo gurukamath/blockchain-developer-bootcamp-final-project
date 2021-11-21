@@ -19,36 +19,58 @@ function AuctionCreator(props) {
 
   return (
     <form>
-      <div id="newAuctionHelp" className="form-text">
-        Please create a new auction here
+      <div className="form-text fs-2">Create A New Auction</div>
+      <div className="container">
+        <div className="row g-3 create-auction-row">
+          <div className="col-md-4">
+            <label htmlFor="auctionName" className="form-label">
+              Auction Name
+            </label>
+          </div>
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              id="auctionName"
+              onChange={handleNameChange}
+            />
+          </div>
+          <div className="col-md-4">
+            <span className="form-text">
+              {nameError !== "" && (
+                <p style={{ color: "red", textAlign: "left" }}>{nameError}</p>
+              )}
+            </span>
+          </div>
+        </div>
+        <div className="row g-3 create-auction-row">
+          <div className="col-md-4">
+            <label htmlFor="auctionName" className="form-label">
+              Auction Description
+            </label>
+          </div>
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              id="auctionDescription"
+              onChange={handleDescChange}
+            />
+          </div>
+          <div className="col-md-4">
+            <span className="form-text">
+              {descError !== "" && (
+                <p style={{ color: "red", textAlign: "left" }}>{descError}</p>
+              )}
+            </span>
+          </div>
+        </div>
       </div>
-      <div className="mb-3">
-        <label htmlFor="auctionName" className="form-label">
-          Auction Name
-        </label>
-        {nameError !== "" && <p style={{ color: "red" }}>{nameError}</p>}
-        <input
-          type="text"
-          className="form-control"
-          id="auctionName"
-          onChange={handleNameChange}
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="auctionDescription" className="form-label">
-          Auction Description
-        </label>
-        {descError !== "" && <p style={{ color: "red" }}>{descError}</p>}
-        <input
-          type="text"
-          className="form-control"
-          id="auctionDescription"
-          onChange={handleDescChange}
-        />
-      </div>
+
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-secondary create-auc-btn"
+        style={{ marginBottom: "40px" }}
         onClick={() => {
           if (name === "") {
             setNameError("The name field is required");
