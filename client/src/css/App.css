@@ -53,6 +53,11 @@
   text-align: right;
 }
 
+.chooseAnotherAuction {
+  width: 50%;
+  margin-top: 20px;
+}
+
 
 .card {
   margin: 30px auto;

@@ -2,11 +2,9 @@ import React from "react";
 import Tile from "./Tile.js";
 import { FullMethodList } from "./FullMethodList.js";
 import { RoleDefinitions, stageDescriptions } from "./Roles.js";
+import GoToOtherAuctions from "./GoToOtherAuctions";
 
 function TileContainer(props) {
-  // const contractMethodList = FullMethodList[props.role+props.stage];
-  // console.log(contractMethodList);
-
   const contractMethodList = FullMethodList.filter((el) => {
     const roleList = RoleDefinitions[props.role + props.stage];
     return roleList.includes(el.name);
@@ -55,6 +53,10 @@ function TileContainer(props) {
       </div>
 
       {tileList}
+      <GoToOtherAuctions
+        chooseAnotherAuction={props.chooseAnotherAuction}
+        showOr={props.showOr}
+      />
     </div>
   );
 }

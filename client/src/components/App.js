@@ -4,6 +4,7 @@ import AuctionSelector from "./AuctionSelector.js";
 import AuctionCreator from "./AuctionCreator.js";
 import Footer from "./Footer.js";
 import Header from "./Header.js";
+import GoToOtherAuctions from "./GoToOtherAuctions";
 import "../css/App.css";
 import { clientInit, defineNewContractInstance } from "./Client.js";
 import { findRole } from "./utils.js";
@@ -17,6 +18,9 @@ let currStage = 0;
 let currAccounts;
 let currNetwork;
 const expectedNetwork = 1337;
+let numWinners;
+let winningBid;
+let winners = [];
 
 function App() {
   const [web3Provider, setWeb3Provider] = useState("");
@@ -79,6 +83,30 @@ function App() {
             .call()
             .catch((e) => window.alert(e));
 
+          if (currStage === "3") {
+            winningBid = await contract.contractDetails.methods[
+              "currentLeaderBid()"
+            ]()
+              .call()
+              .catch((e) => window.alert(e));
+
+            numWinners = await contract.contractDetails.methods[
+              "getLeadersNum()"
+            ]()
+              .call()
+              .catch((e) => window.alert(e));
+
+            for (let i = 0; i < numWinners; i++) {
+              let winner = await contract.contractDetails.methods[
+                "getLeader(uint256)"
+              ](i)
+                .call()
+                .catch((e) => window.alert(e));
+
+              winners.push(winner);
+            }
+          }
+
           setStage(currStage);
         }
 
@@ -108,12 +136,6 @@ function App() {
   async function providerConnect() {
     const web3 = await clientInit().catch((e) => window.alert(e.message));
     setWeb3Provider(web3);
-
-    // currNetwork = await web3.eth
-    //   .getChainId()
-    //   .catch((e) => window.alert(e.message));
-
-    // setNetwork(currNetwork);
   }
 
   async function createNewAuction(name, desc) {
@@ -152,6 +174,15 @@ function App() {
       desc: auction._desc,
       address: auction.newAddress,
       contractDetails: newContract,
+    });
+  }
+
+  function chooseAnotherAuction() {
+    setContract({
+      name: "",
+      desc: "",
+      address: "",
+      contractDetails: "",
     });
   }
 
@@ -196,7 +227,8 @@ function App() {
               web3={web3Provider}
               contract={contract}
               accounts={accounts}
-              // handleClick={handleClick}
+              chooseAnotherAuction={chooseAnotherAuction}
+              showOr={1}
               role={role}
               stage={stage}
             />
@@ -211,7 +243,8 @@ function App() {
               web3={web3Provider}
               contract={contract}
               accounts={accounts}
-              // handleClick={handleClick}
+              chooseAnotherAuction={chooseAnotherAuction}
+              showOr={1}
               role={role}
               stage={stage}
             />
@@ -226,10 +259,29 @@ function App() {
               web3={web3Provider}
               contract={contract}
               accounts={accounts}
-              // handleClick={handleClick}
+              chooseAnotherAuction={chooseAnotherAuction}
+              showOr={1}
               role={role}
               stage={stage}
             />
+          </div>
+        )}
+
+      {network === expectedNetwork &&
+        contract.contractDetails &&
+        role === "AuctionParticipant" &&
+        stage === "0" && (
+          <div>
+            <div className="card">
+              <div className="card-body">
+                <p>
+                  The auction is in the start stage. As an auction participant,
+                  you cannot perform any actions right now. Please wait for the
+                  auction owner to start the commit stage.
+                </p>
+              </div>
+            </div>
+            <GoToOtherAuctions chooseAnotherAuction={chooseAnotherAuction} />
           </div>
         )}
 
@@ -242,7 +294,8 @@ function App() {
               web3={web3Provider}
               contract={contract}
               accounts={accounts}
-              // handleClick={handleClick}
+              chooseAnotherAuction={chooseAnotherAuction}
+              showOr={1}
               role={role}
               stage={stage}
             />
@@ -257,10 +310,30 @@ function App() {
               web3={web3Provider}
               contract={contract}
               accounts={accounts}
-              // handleClick={handleClick}
+              chooseAnotherAuction={chooseAnotherAuction}
+              showOr={1}
               role={role}
               stage={stage}
             />
+          </div>
+        )}
+      {network === expectedNetwork &&
+        contract.contractDetails &&
+        stage === "3" && (
+          <div>
+            <div className="card">
+              <div className="card-body">
+                <p>This auction has been closed.</p>
+                <p>
+                  The winning bid is <b>{winningBid}</b>
+                </p>
+                <p>The winning participant(s) is(are)</p>
+                {winners.map((v, i) => {
+                  return <b key={i}>{v}</b>;
+                })}
+              </div>
+            </div>
+            <GoToOtherAuctions chooseAnotherAuction={chooseAnotherAuction} />
           </div>
         )}
       <Footer />
