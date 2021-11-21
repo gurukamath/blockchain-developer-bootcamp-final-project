@@ -21,9 +21,9 @@ const sendFunction = async (inputs, functionHash, contract, accounts) => {
       result.error = handleErrorMessage(e.message);
     });
 
-  return (
-    "Transaction Successful: " + result.success.transactionHash ?? result.error
-  );
+  return result.success
+    ? "Transaction Successful: " + result.success.transactionHash
+    : result.error;
 };
 
 export const FullMethodList = [
