@@ -10,8 +10,8 @@
 
 ## Inheritence and Interfaces
 
-- The `SecretAuction`contract inherits from Open Zeppelin `Ownable.sol`
+- The `SecretAuction` contract inherits from Open Zeppelin `Ownable.sol`
 
 ## Factory Design Pattern
 
-- Individual `SecretAuction` contracts be deplcoyed by isung the `AuctionFactory` contract.
+- Individual `SecretAuction` contracts be deployed by using the `AuctionFactory` contract.

@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 /// @title Secret Auction Contract
 /// @author Guruprasad Kamath
 /// @dev Smart-contract to conduct secret auctions
-contract SecretAuction {
-    /// Variables
-
-    /// @notice owner of the auction
-    address public owner;
+contract SecretAuction is Ownable {
+    /// Variable
 
     /// @notice Current Leader address(s). Array in case of a tie. Final winner(s) upon auction close
     address[] public currentLeaders;
@@ -49,12 +48,6 @@ contract SecretAuction {
     event BidRevealed(address _address, uint256 _bidAmount, string _auctionKey);
 
     ///Modifiers
-    /// @dev Verfiy that the address is that of the auction owner
-    /// @param _addr address
-    modifier isOwner(address _addr) {
-        require(_addr == owner, "You are not the owner of this auction");
-        _;
-    }
 
     /// @dev Checks if the auction is in "start" stage
     modifier StartStage() {
@@ -86,25 +79,25 @@ contract SecretAuction {
     /// @dev creates a auction and defines its owner
     /// @param _owner an ethereum address that will be defined as the auction owner
     constructor(address _owner) {
-        owner = _owner;
+        transferOwnership(_owner);
 
         emit LogStageChange("The auction has been deployed to the chain");
     }
 
     /// @dev changes the stage from "start" to "commit". Only the auction owner can execute this
-    function StartCommitStage() external isOwner(msg.sender) StartStage {
+    function StartCommitStage() external onlyOwner() StartStage {
         auctionStage = AuctionStage.Commit;
         emit LogStageChange("Bids can be committed now");
     }
 
     /// @dev changes the stage from "commit" to "reveal". Only the auction owner can execute this
-    function StartRevealStage() external isOwner(msg.sender) CommitStage {
+    function StartRevealStage() external onlyOwner() CommitStage {
         auctionStage = AuctionStage.Reveal;
         emit LogStageChange("Bids can be revealed now");
     }
 
     /// @dev closes the auction. Only the auction owner can execute this
-    function CloseAuction() external isOwner(msg.sender) RevealStage {
+    function CloseAuction() external onlyOwner() RevealStage {
         auctionStage = AuctionStage.Closed;
         emit LogStageChange("Auction Closed");
     }
