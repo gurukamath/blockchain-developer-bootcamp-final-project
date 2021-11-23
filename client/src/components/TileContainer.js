@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Tile from "./Tile.js";
 import { FullMethodList } from "./FullMethodList.js";
 import { RoleDefinitions, stageDescriptions } from "./Roles.js";
 import GoToOtherAuctions from "./GoToOtherAuctions";
 
 function TileContainer(props) {
+  const [success, setSuccess] = useState(0);
+
   const contractMethodList = FullMethodList.filter((el) => {
     const roleList = RoleDefinitions[props.role + props.stage];
     return roleList.includes(el.name);
   });
+
+  function activateSuccess() {
+    setSuccess(1);
+  }
 
   const tileList = contractMethodList.map((v, i) => (
     <div key={i}>
@@ -17,6 +23,7 @@ function TileContainer(props) {
         web3={props.web3}
         contract={props.contract.contractDetails}
         accounts={props.accounts}
+        activateSuccess={activateSuccess}
       />
     </div>
   ));
@@ -53,6 +60,15 @@ function TileContainer(props) {
       </div>
 
       {tileList}
+      {props.stage === "2" && success === 1 && props.role === "AuctionOwner" && (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => props.refreshAuction()}
+        >
+          Proceed
+        </button>
+      )}
       <GoToOtherAuctions
         chooseAnotherAuction={props.chooseAnotherAuction}
         showOr={props.showOr}

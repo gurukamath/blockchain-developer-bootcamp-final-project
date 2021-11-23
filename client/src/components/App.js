@@ -96,6 +96,7 @@ function App() {
               .call()
               .catch((e) => window.alert(e));
 
+            winners = [];
             for (let i = 0; i < numWinners; i++) {
               let winner = await contract.contractDetails.methods[
                 "getLeader(uint256)"
@@ -163,6 +164,11 @@ function App() {
     });
   }
 
+  function refreshAuction() {
+    const auction = { ...contract };
+    setContract(auction);
+  }
+
   async function selectAuction(auction) {
     const newContract = new web3Provider.eth.Contract(
       contractJSON.abi,
@@ -228,6 +234,7 @@ function App() {
               contract={contract}
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
+              refreshAuction={refreshAuction}
               showOr={1}
               role={role}
               stage={stage}
@@ -244,6 +251,7 @@ function App() {
               contract={contract}
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
+              refreshAuction={refreshAuction}
               showOr={1}
               role={role}
               stage={stage}
@@ -260,6 +268,7 @@ function App() {
               contract={contract}
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
+              refreshAuction={refreshAuction}
               showOr={1}
               role={role}
               stage={stage}
@@ -295,6 +304,7 @@ function App() {
               contract={contract}
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
+              refreshAuction={refreshAuction}
               showOr={1}
               role={role}
               stage={stage}
@@ -311,6 +321,7 @@ function App() {
               contract={contract}
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
+              refreshAuction={refreshAuction}
               showOr={1}
               role={role}
               stage={stage}
@@ -329,7 +340,11 @@ function App() {
                 </p>
                 <p>The winning participant(s) is(are)</p>
                 {winners.map((v, i) => {
-                  return <b key={i}>{v}</b>;
+                  return (
+                    <p>
+                      <b key={i}>{v}</b>
+                    </p>
+                  );
                 })}
               </div>
             </div>

@@ -37,7 +37,9 @@ function Tile(props) {
         });
     }
 
-    if (!t) {
+    if (t) {
+      props.activateSuccess();
+    } else {
       t = err;
     }
 
