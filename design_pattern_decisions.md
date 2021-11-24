@@ -15,3 +15,7 @@
 ## Factory Design Pattern
 
 - Individual `SecretAuction` contracts be deployed by using the `AuctionFactory` contract.
+
+## Commit Reveal Design Pattern
+
+- The contract uses a commit-reveal design pattern to keep the commited bids secret until they are finally revealed
