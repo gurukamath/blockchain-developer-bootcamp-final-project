@@ -1,17 +1,13 @@
 # Security considerations
 
-## Use Modifiers for Validations
+## SWC-136 Unencrypted Private Data On-Chain
 
-- The auction functions use the following modifiers at various stages
-  - `StartStage`
-  - `CommitStage`
-  - `RevealStage`
-- Additionally the `onlyOwner()` modifier from OpenZeppelin's `Ownable` design pattern is used wherever a certain action is only allowed for the contract owner
+- Since the bids are to be kept secret until the reveal stage is reached, the committed bids are stored on-chain in an encrypted form on-chain.
 
-## Use of Require, Assert and Revert
+## SWC-123 Requirement Violation
 
 - The validations have been used at various stages to gaurd against actions that are not allowed
 
-## TX Origin Authentication
+## SWC-115 Authorization through tx.origin
 
 - Owner authentication is done using msg.sender and not tx.origin
