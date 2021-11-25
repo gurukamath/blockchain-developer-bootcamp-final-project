@@ -24,6 +24,7 @@ function TileContainer(props) {
         contract={props.contract.contractDetails}
         accounts={props.accounts}
         activateSuccess={activateSuccess}
+        setStatus={props.setStatus}
       />
     </div>
   ));

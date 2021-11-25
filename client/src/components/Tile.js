@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TileInputs from "./TileInputs.js";
 import { handleErrorMessage } from "./utils.js";
+import { Spinner } from "react-bootstrap";
 
 function Tile(props) {
   const _method = props.contractMethod;
@@ -8,12 +9,14 @@ function Tile(props) {
 
   const [inputs, setInputs] = useState(Array(inputsList.length).fill(""));
   const [output, setOutput] = useState("");
+  const [status, setStatus] = useState("READY");
 
   const changeFunctions = function (i, v) {
     setInputs(Object.assign([...inputs], { [i]: v }));
   };
 
   const clickFunctions = async function () {
+    setStatus("LOADING");
     let t;
     let err;
 
@@ -46,6 +49,8 @@ function Tile(props) {
     setInputs(Array(inputsList.length).fill(""));
     setOutput(t);
 
+    setStatus("READY");
+
     // setTimeout(() => { setOutput(''); props.handleClick() }, 6000);
   };
 
@@ -63,6 +68,12 @@ function Tile(props) {
 
   return (
     <div>
+      {status === "LOADING" && (
+        <div>
+          <Spinner animation="border" size="sm" style={{ marginTop: "20px" }} />
+          <p>Loading...</p>
+        </div>
+      )}
       <div className="mb-3 tile">
         <span className="input-group-text" id="basic-addon2">
           {_method.name}
@@ -73,15 +84,17 @@ function Tile(props) {
       {output && (
         <input type="text" className="output-display" readOnly value={output} />
       )}
-      <span className="input-group-text" id="button-addon">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={(e) => clickFunctions()}
-        >
-          Call Function
-        </button>
-      </span>
+      {
+        <span className="input-group-text" id="button-addon">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={(e) => clickFunctions()}
+          >
+            Call Function
+          </button>
+        </span>
+      }
     </div>
   );
 }

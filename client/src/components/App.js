@@ -8,6 +8,7 @@ import GoToOtherAuctions from "./GoToOtherAuctions";
 import "../css/App.css";
 import { clientInit, defineNewContractInstance } from "./Client.js";
 import { findRole } from "./utils.js";
+import { Spinner } from "react-bootstrap";
 
 const contractJSON = require("../contracts/SecretAuction.json");
 const factoryJSON = require("../contracts/AuctionFactory.json");
@@ -35,6 +36,14 @@ function App() {
   });
   const [role, setRole] = useState("");
   const [stage, setStage] = useState(0);
+
+  const loadState = {
+    LOADING: "LOADING",
+    READY: "READY",
+    ERROR: "ERROR",
+  };
+
+  const [status, setStatus] = useState(loadState.READY);
 
   useEffect(() => {
     async function fetchData() {
@@ -65,7 +74,8 @@ function App() {
         });
       }
     }
-    fetchData();
+    setStatus("LOADING");
+    fetchData().then(() => setStatus("READY"));
   }, [web3Provider]);
 
   useEffect(() => {
@@ -131,15 +141,19 @@ function App() {
       }
     }
 
-    fetchData();
+    setStatus("LOADING");
+    fetchData().then(() => setStatus("READY"));
   }, [web3Provider, contract, accounts, network]);
 
   async function providerConnect() {
+    setStatus(loadState.LOADING);
     const web3 = await clientInit().catch((e) => window.alert(e.message));
     setWeb3Provider(web3);
+    setStatus(loadState.READY);
   }
 
   async function createNewAuction(name, desc) {
+    setStatus(loadState.LOADING);
     factory = await defineNewContractInstance(web3Provider, factoryJSON);
 
     const receipt = await factory.methods["createAuction(string,string)"](
@@ -162,14 +176,18 @@ function App() {
       address: newContractDetails.newAddress,
       contractDetails: newContract,
     });
+    setStatus(loadState.READY);
   }
 
   function refreshAuction() {
+    setStatus(loadState.LOADING);
     const auction = { ...contract };
     setContract(auction);
+    setStatus(loadState.READY);
   }
 
   async function selectAuction(auction) {
+    setStatus(loadState.LOADING);
     const newContract = new web3Provider.eth.Contract(
       contractJSON.abi,
       auction.newAddress
@@ -181,39 +199,53 @@ function App() {
       address: auction.newAddress,
       contractDetails: newContract,
     });
+    setStatus(loadState.READY);
   }
 
   function chooseAnotherAuction() {
+    setStatus(loadState.LOADING);
     setContract({
       name: "",
       desc: "",
       address: "",
       contractDetails: "",
     });
+    setStatus(loadState.READY);
   }
 
   return (
     <div className="App">
       <Header account={accounts[0]} />
-      {!web3Provider && !contract.contractDetails && (
-        <button
-          onClick={() => {
-            providerConnect();
-          }}
-          className="btn btn-secondary connectClient"
-        >
-          Connect Client
-        </button>
-      )}
-      {web3Provider && network !== expectedNetwork && (
+      {!web3Provider &&
+        !contract.contractDetails &&
+        status === loadState.READY && (
+          <button
+            onClick={() => {
+              providerConnect();
+            }}
+            className="btn btn-secondary connectClient"
+          >
+            Connect Client
+          </button>
+        )}
+      {status === loadState.LOADING && (
         <div>
-          You are not connected to the Ropsten Network. Please change the
-          network in your Web3 provider.
+          <Spinner animation="border" size="sm" style={{ marginTop: "20px" }} />
+          <p>Loading...</p>
         </div>
       )}
       {web3Provider &&
+        network !== expectedNetwork &&
+        status === loadState.READY && (
+          <div>
+            You are not connected to the Ropsten Network. Please change the
+            network in your Web3 provider.
+          </div>
+        )}
+      {web3Provider &&
         network === expectedNetwork &&
-        !contract.contractDetails && (
+        !contract.contractDetails &&
+        status === loadState.READY && (
           <div>
             <AuctionCreator createNewAuction={createNewAuction} />
             {deployedAuctionAddresses.length !== 0 && (
@@ -227,7 +259,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionOwner" &&
-        stage === "0" && (
+        stage === "0" &&
+        status === loadState.READY && (
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
@@ -235,6 +268,7 @@ function App() {
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
               refreshAuction={refreshAuction}
+              setStatus={[status, setStatus]}
               showOr={1}
               role={role}
               stage={stage}
@@ -244,7 +278,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionOwner" &&
-        stage === "1" && (
+        stage === "1" &&
+        status === loadState.READY && (
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
@@ -252,6 +287,7 @@ function App() {
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
               refreshAuction={refreshAuction}
+              setStatus={[status, setStatus]}
               showOr={1}
               role={role}
               stage={stage}
@@ -261,7 +297,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionOwner" &&
-        stage === "2" && (
+        stage === "2" &&
+        status === loadState.READY && (
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
@@ -269,6 +306,7 @@ function App() {
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
               refreshAuction={refreshAuction}
+              setStatus={[status, setStatus]}
               showOr={1}
               role={role}
               stage={stage}
@@ -279,7 +317,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionParticipant" &&
-        stage === "0" && (
+        stage === "0" &&
+        status === loadState.READY && (
           <div>
             <div className="card">
               <div className="card-body">
@@ -297,7 +336,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionParticipant" &&
-        stage === "1" && (
+        stage === "1" &&
+        status === loadState.READY && (
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
@@ -305,6 +345,7 @@ function App() {
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
               refreshAuction={refreshAuction}
+              setStatus={[status, setStatus]}
               showOr={1}
               role={role}
               stage={stage}
@@ -314,7 +355,8 @@ function App() {
       {network === expectedNetwork &&
         contract.contractDetails &&
         role === "AuctionParticipant" &&
-        stage === "2" && (
+        stage === "2" &&
+        status === loadState.READY && (
           <div className="tileContainer">
             <TileContainer
               web3={web3Provider}
@@ -322,6 +364,7 @@ function App() {
               accounts={accounts}
               chooseAnotherAuction={chooseAnotherAuction}
               refreshAuction={refreshAuction}
+              setStatus={[status, setStatus]}
               showOr={1}
               role={role}
               stage={stage}
@@ -330,7 +373,8 @@ function App() {
         )}
       {network === expectedNetwork &&
         contract.contractDetails &&
-        stage === "3" && (
+        stage === "3" &&
+        status === loadState.READY && (
           <div>
             <div className="card">
               <div className="card-body">
