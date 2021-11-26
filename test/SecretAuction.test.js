@@ -89,6 +89,10 @@ contract("AuctionFactory", async (accounts) => {
       assert.equal(auctionStage, 2, "The auction is not in reveal stage");
     });
 
+    it("Owner cannot switch back to the commit stage", async () => {
+      catchRevert(instance.StartCommitStage({ from: owner }));
+    });
+
     it("Non-owner cannot start the reveal stage", async () => {
       catchRevert(instance.StartRevealStage({ from: alice }));
     });
@@ -158,6 +162,39 @@ contract("AuctionFactory", async (accounts) => {
       catchRevert(instance.RevealCommittedBid(amountAlice, "Thisisalice"), {
         from: alice,
       });
+    });
+  });
+
+  describe("When the auction is closed", async () => {
+    beforeEach(async () => {
+      const factoryInstance = await AuctionFactory.new();
+      const createTx = await factoryInstance.createAuction(
+        "Test",
+        "This is a test Auction",
+        { from: owner }
+      );
+
+      const newContractAddress = createTx["logs"][0]["args"]["newAddress"];
+      instance = await SecretAuction.at(newContractAddress);
+      await instance.StartCommitStage({ from: owner });
+      await instance.StartRevealStage({ from: owner });
+      await instance.CloseAuction({ from: owner });
+    });
+
+    it("Owner cannot revert to reveal stage", async () => {
+      catchRevert(instance.StartRevealStage({ from: owner }));
+    });
+
+    it("Owner cannot revert to commit stage", async () => {
+      catchRevert(instance.StartCommitStage({ from: owner }));
+    });
+
+    it("Non-owner cannot revert to reveal stage", async () => {
+      catchRevert(instance.StartRevealStage({ from: alice }));
+    });
+
+    it("Non-owner cannot revert to commit stage", async () => {
+      catchRevert(instance.StartCommitStage({ from: alice }));
     });
   });
 });
