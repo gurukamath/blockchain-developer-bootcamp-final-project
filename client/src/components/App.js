@@ -18,7 +18,7 @@ let currRole = "";
 let currStage = 0;
 let currAccounts;
 let currNetwork;
-const expectedNetwork = 1337;
+const expectedNetwork = 3;
 let numWinners;
 let winningBid;
 let winners = [];
