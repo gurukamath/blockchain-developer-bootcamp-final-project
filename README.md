@@ -20,6 +20,8 @@ Every auction will have 3 stages.
 
 Once the owner closes the auction, the highest revealed bid is considered to be the winner.
 
+![alt text](https://github.com/gurukamath/blockchain-developer-bootcamp-final-project/blob/main/Auction_Process.png?raw=true)
+
 # Further Development
 
 The following features are under consideration for future development
