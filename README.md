@@ -16,10 +16,10 @@ https://blockchain-developer-bootcamp-final-project-6b9gdg8sv.vercel.app
 
 ## Pre-requisites
 
-Node Version: v14.17.3
-Truffle: v5.4.11
-ganache
-npm
+- Node Version: v14.17.3
+- Truffle: v5.4.11
+- ganache
+- npm
 
 ## Local Contract Testing
 
