@@ -6,7 +6,45 @@ Application For Secret Auctioning of Entities
 
 In many business transactions, including the sale of company assets or an entire company, auctions are conducted in a closed format whereby interested parties submit sealed bids to the seller. These bid amounts are only known by the seller. Sometimes, government assets are sold/leased/allocated this way. Because of the high value of the items that are usually involved in such auctions, this could lead to collusion between the seller and some of the bidders. This app aims to conduct such auctions on chain so that nobody (not even the seller), is aware of what the various bids are until the auction is over.
 
-# The Application
+
+# Deployed Version URL
+
+https://blockchain-developer-bootcamp-final-project-6b9gdg8sv.vercel.app
+
+
+# How to run this project locally
+
+## Pre-requisites
+
+Node Version: v14.17.3
+Truffle: v5.4.11
+ganache
+npm
+
+## Local Contract Testing
+
+- git clone `https://github.com/gurukamath/blockchain-developer-bootcamp-final-project.git`
+- Run `npm install` in project root to install Truffle build and smart contract dependencies
+- Run the local testnet in port 8545 with the `truffle develop` command
+- Run the tests in Truffle console: `test`
+- Development network id is 1337, remember to change it in Metamask as well if you are trying out the front-end!
+
+## Frontend
+
+- `cd client`
+- `npm install`
+- `npm start`
+- Open `http://localhost:3000`
+
+## Screencast Link
+
+
+## Public Wallet for Certification
+
+0xCde6F97F6D97E7Cd53Ff15edbe0E42D5Ca57635D
+
+
+# The Application - Techincal Details
 
 The intereseted parties will be able to submit secret bids to a smart contract. The owner of the contract will only be able to declare/control the opening and closing of the auction (both of which will emit events that any interested party can listen into/track). Upon auction close, the smart contract will decide the winning bid without further intervention from the owner.
 
@@ -20,7 +58,13 @@ Every auction will have 3 stages.
 
 Once the owner closes the auction, the highest revealed bid is considered to be the winner.
 
-![alt text](https://github.com/gurukamath/blockchain-developer-bootcamp-final-project/blob/main/Auction_Process.png?raw=true)
+# Directory Structure
+
+- client: Project's React frontend.
+- contracts: Smart contracts that are deployed in the Ropsten testnet.
+- migrations: Migration files for deploying contracts in contracts directory.
+- test: Tests for smart contracts.
+
 
 # Further Development
 
